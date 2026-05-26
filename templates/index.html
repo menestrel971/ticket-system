@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Подать заявку — Automind HUB</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 560px;
+    color: #fff;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .logo-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .logo h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo p  { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 4px; }
+
+  .form-group { margin-bottom: 18px; }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 7px;
+    letter-spacing: 0.3px;
+  }
+  label span { color: #f472b6; }
+  input, textarea {
+    width: 100%;
+    padding: 13px 16px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    transition: border-color .2s, background .2s;
+    outline: none;
+    font-family: inherit;
+  }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+  input:focus, textarea:focus {
+    border-color: #667eea;
+    background: rgba(102,126,234,0.1);
+  }
+  textarea { resize: vertical; min-height: 120px; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    margin-top: 8px;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+  }
+  .btn:active { transform: translateY(0); }
+
+  .footer-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+  }
+  .footer-link a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .footer-link a:hover { text-decoration: underline; }
+
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: rgba(255,255,255,0.7);
+  }
+  .spinner {
+    display: inline-block;
+    width: 28px; height: 28px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">🤖</div>
+    <h1>Automind HUB</h1>
+    <p>Система обработки заявок</p>
+  </div>
+
+  <form id="ticketForm" action="/submit" method="post">
+    <div class="row">
+      <div class="form-group">
+        <label>Ваше имя <span>*</span></label>
+        <input type="text" name="name" placeholder="Иван Иванов" required>
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="tel" name="phone" placeholder="+7 700 000 0000">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email <span>*</span></label>
+      <input type="email" name="email" placeholder="ivan@example.com" required>
+    </div>
+
+    <div class="form-group">
+      <label>Тема обращения <span>*</span></label>
+      <input type="text" name="subject" placeholder="Кратко опишите суть вопроса" required>
+    </div>
+
+    <div class="form-group">
+      <label>Подробное описание <span>*</span></label>
+      <textarea name="message" placeholder="Опишите вашу проблему или вопрос как можно подробнее..." required></textarea>
+    </div>
+
+    <button type="submit" class="btn" id="submitBtn">
+      📤 Отправить заявку
+    </button>
+  </form>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>AI обрабатывает заявку...</div>
+  </div>
+
+  <div class="footer-link">
+    <a href="/dashboard">📊 Дашборд руководителя</a>
+  </div>
+</div>
+
+<script>
+document.getElementById('ticketForm').addEventListener('submit', function() {
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+});
+</script>
+</body>
+</html>
